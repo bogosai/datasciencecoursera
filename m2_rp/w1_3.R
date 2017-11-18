@@ -1,12 +1,12 @@
 corr <- function(directory,threshold=0) {
-        if (threshold>0) {
+        
                 #rng <-ids
                 flist <-list.files(directory)
-                if (length(flist>0)) {
+                if (length(flist)>0) {
                         data <-data.frame()
                         
                         for (i in 1:length(flist)) {
-                        #for (i in 1:4) {
+                        
                                 data <- rbind(data,read.csv(file.path(directory,flist[i]),skip=1,header=FALSE))
                         }
                         
@@ -16,7 +16,16 @@ corr <- function(directory,threshold=0) {
                         #fctr <- factor(sbset[,"id"],levels=1:4)
                         dframe <- data.frame(table(fctr))
                         colnames(dframe) <- c("id","nobs")
-                        dframe[dframe[,"nobs"]>threshold,]
+                        ftr <- dframe[dframe[,"nobs"]>threshold,]
+                        
+                        for (i in 1:length(ftr$id)) {
+                                sbsetId <- sbset[sbset[,"id"] == i,]
+                                print(sbsetId[,"sulfate"])
+                                #rslt <- rbind(sbsetId,cor(sbsetId[,"sulfate"],sbsetId[,"nitrate"]))
+                                
+                        }
+                        
+                        #rslt
                 } #if (length(flist>0))
-        } #if (threshold>0) 
+        
 }
