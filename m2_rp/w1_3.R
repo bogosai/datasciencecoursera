@@ -17,15 +17,16 @@ corr <- function(directory,threshold=0) {
                         dframe <- data.frame(table(fctr))
                         colnames(dframe) <- c("id","nobs")
                         ftr <- dframe[dframe[,"nobs"]>threshold,]
-                        
+                        rslt<-data.frame()
                         for (i in 1:length(ftr$id)) {
                                 sbsetId <- sbset[sbset[,"id"] == i,]
-                                print(sbsetId[,"sulfate"])
-                                #rslt <- rbind(sbsetId,cor(sbsetId[,"sulfate"],sbsetId[,"nitrate"]))
-                                
+                                #print(cor(sbsetId[,"sulfate"],sbsetId[,"nitrate"]))
+                                rslt <- rbind(rslt,c(i,cor(sbsetId[,"sulfate"],sbsetId[,"nitrate"])))
+                                #rslt <- cbind(i,rslt)
                         }
                         
-                        #rslt
+                        colnames(rslt)<-c("id","cor")
+                        rslt
                 } #if (length(flist>0))
         
 }
