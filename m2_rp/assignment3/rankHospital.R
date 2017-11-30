@@ -18,10 +18,11 @@ rankhospital <- function(state,outcome,num=61) {
         fdata <- data.frame(fdata)
 
         colnames(fdata) <- c("value","order")
+        # fdata
         if (num=="best") {
-                f<-head(fdata,1)        
+                f<-head(fdata,1)
                 f<-f$value
-                
+
         } else if (num=="worst") {
                 f<-tail(fdata,1)
                 f<-f$value
@@ -29,8 +30,14 @@ rankhospital <- function(state,outcome,num=61) {
                 f <- fdata[fdata[,"order"]==num,]
                 f <- f$value
         }
-        
+
         data <- data[data[,outcome]==f,]
+        data <- data[order(data[,"Hospital"]),]
+        data
+        
+        
+        
+        
         # data <- head(data[order(data[,"Hospital"]),],1)
         # 
         # Hospital.Name <<- data$Hospital
