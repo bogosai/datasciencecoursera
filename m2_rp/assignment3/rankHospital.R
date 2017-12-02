@@ -1,45 +1,57 @@
 rankhospital <- function(state,outcome,num=61) {
         
-        readData <- data.frame()
-        readData <- read.csv("outcome-of-care-measures.csv", colClasses = "character")
-        data <- readData[,c(2,7,15,21,27)]
-        colnames(data) <- c("Hospital","State","Heart Attack","Heart Failure","Pneumonia")
-        nm <- names(data)
+        outcome <- tolower(outcome)
+        state <- toupper(state)
         
-        if (sum(nm==outcome) ==0) stop("Invalid outcome")
-        if (nrow(data[data[,"State"]==state,])==0) stop("Invalid state")
+        #checking whether num is either best or worst, if is.character at all
+
         
-        data <- data[data[,"State"]==state & !is.na(data[,outcome]) & data[,outcome]!="Not Available",]
-        data <- data[,c("Hospital",outcome)]
-        ldata <- as.numeric(levels(factor(data[,outcome])))
-        odata <- order(ldata)
-
-        fdata <- cbind(ldata[odata],seq_along(1:length(odata)))
-        fdata <- data.frame(fdata)
-
-        colnames(fdata) <- c("value","order")
-        # fdata
-        if (num=="best") {
-                f<-head(fdata,1)
-                f<-f$value
-
-        } else if (num=="worst") {
-                f<-tail(fdata,1)
-                f<-f$value
+        #limiting Outcome to Heart Attack, Heart Failure, Pheumonia
+        if (outcome == "heart attack") {
+                i <- 11
+        } else if (outcome == "heart failure") {
+                i <- 17
+        } else if (outcome == "pneumonia") {
+                i <- 23
         } else {
-                f <- fdata[fdata[,"order"]==num,]
-                f <- f$value
+                stop("invalid outcome")
         }
+        
+        
+        readData <- data.frame()
+        readData <- read.csv("outcome-of-care-measures.csv", colClasses = "character",stringsAsFactors=FALSE)
+        
+        #checking if state provided exists in data regardless CASE
+        if (nrow(readData[readData[,"State"]==state,])==0) stop("Invalid state")
+        
+        #filtering data on State and Outcome column on NA and Not Availables
+        readData <- readData[readData[,"State"]==state & !is.na(readData[,i]) & readData[,i]!="Not Available",]
+        
+        
+        lens<- length(readData[,i])
+        
+        #ordering first on Outcome and then on Hostpital alphabetically
+        readData <- readData[order(readData[,i],readData[,"Hospital.Name"]),]
+        
+        #introducing row numbers based on Ordering
+        readData <- cbind(seq_along(1:lens),readData)
 
-        data <- data[data[,outcome]==f,]
-        data <- data[order(data[,"Hospital"]),]
-        data
+        if(is.character(num)) {
+                
+                num <- tolower(num)
+                if (sum(num==c("best","worst"))==1) {
+                        if (num=="best") {num <- 1}
+                        else {num <- lens}
+                } else {num <- lens+1}
+        }
         
-        
-        
-        
-        # data <- head(data[order(data[,"Hospital"]),],1)
-        # 
-        # Hospital.Name <<- data$Hospital
+        if(lens >= num) {
+                
+                f <- readData[readData[,1]==num,]
+                f <- f$'Hospital.Name'
+                
+        } else {f<-"NA"}
 
+        Hospital.Name <<- f
+        Hospital.Name
 }
