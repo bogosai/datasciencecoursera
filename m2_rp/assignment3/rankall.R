@@ -1,4 +1,4 @@
-rankall <- function(outcome,num=61) {
+rankall <- function(outcome,num="best") {
         
         outcome <- tolower(outcome)
         
@@ -19,7 +19,7 @@ rankall <- function(outcome,num=61) {
         
         
         readData <- data.frame()
-        readData <- read.csv("outcome-of-care-measures.csv", colClasses = "character",stringsAsFactors=FALSE)
+        readData <- read.csv("outcome-of-care-measures.csv", stringsAsFactors=FALSE)
         
         #checking if state provided exists in data regardless CASE
         #if (nrow(readData[readData[,"State"]==state,])==0) stop("Invalid state")
@@ -39,7 +39,7 @@ rankall <- function(outcome,num=61) {
                 lens<- length(areadData[,i])
                 # 
                 # 
-                areadData <- areadData[order(areadData[,i],areadData[,"Hospital.Name"]),]
+                areadData <- areadData[order(as.numeric(areadData[,i]),areadData[,"Hospital.Name"]),]
                 # 
                 # 
                 areadData <- cbind(seq_along(1:lens),areadData)
@@ -66,6 +66,6 @@ rankall <- function(outcome,num=61) {
                 Hospital.Name <- rbind.data.frame(Hospital.Name,data.frame(f,fstate[k]))
                 
         }       
-        colnames(Hospital.Name) <- c("Hospital","State")
+        colnames(Hospital.Name) <- c("hospital","state")
         print(Hospital.Name)
 }

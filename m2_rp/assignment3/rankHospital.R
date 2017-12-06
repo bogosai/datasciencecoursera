@@ -1,4 +1,4 @@
-rankhospital <- function(state,outcome,num=61) {
+rankhospital <- function(state,outcome,num="best") {
         
         outcome <- tolower(outcome)
         state <- toupper(state)
@@ -19,7 +19,7 @@ rankhospital <- function(state,outcome,num=61) {
         
         
         readData <- data.frame()
-        readData <- read.csv("outcome-of-care-measures.csv", colClasses = "character",stringsAsFactors=FALSE)
+        readData <- read.csv("outcome-of-care-measures.csv",stringsAsFactors=FALSE) #colClasses = "character"
         
         #checking if state provided exists in data regardless CASE
         if (nrow(readData[readData[,"State"]==state,])==0) stop("Invalid state")
@@ -30,26 +30,25 @@ rankhospital <- function(state,outcome,num=61) {
         
         lens<- length(readData[,i])
         
-        #ordering first on Outcome and then on Hostpital alphabetically
-        readData <- readData[order(readData[,i],readData[,"Hospital.Name"]),]
         
-        #introducing row numbers based on Ordering
-        readData <- cbind(seq_along(1:lens),readData)
+        readData <- readData[order(as.numeric(readData[,i]),readData[,"Hospital.Name"]),]
+        
 
-        if(is.character(num)) {
-                
-                num <- tolower(num)
-                if (sum(num==c("best","worst"))==1) {
-                        if (num=="best") {num <- 1}
-                        else {num <- lens}
-                } else {num <- lens+1}
-        }
+        readData <- cbind(seq_along(1:lens),readData)
         
+        # print(readData)
+        if (sum(num==c("best","worst"))>=1) {
+                if (num=="best") {num <- 1}
+                else if (num == "worst") {num <- lens}
+                else if (is.character(num)) {num <- lens+1}
+        } else if (is.character(num)) {num <- lens+1}
+
+
         if(lens >= num) {
-                
+                f <- data.frame()
                 f <- readData[readData[,1]==num,]
                 f <- f$'Hospital.Name'
-                
+
         } else {f<-"NA"}
 
         Hospital.Name <<- f
