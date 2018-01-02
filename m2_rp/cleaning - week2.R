@@ -19,7 +19,7 @@ readsql <- function() {
 
 readgh <- function(murl="https://api.github.com/users/jtleek/repos",usr="jtleek",rep="datasharing"){
         v <- (function(){
-                x<-c("httr","httpuv","sqldf","dplyr","XML","xlsx","RMySQL","readr","tidyr")
+                x<-c("data.table","httr","httpuv","sqldf","dplyr","XML","xlsx","RMySQL","readr","tidyr","reshape2")
                 lapply(x, require, character.only = TRUE)
                 myapp <- oauth_app("github",
                                    key = "e5660b47a233d2ed3622",
@@ -44,17 +44,22 @@ readgh <- function(murl="https://api.github.com/users/jtleek/repos",usr="jtleek"
 }
 
 
-dload <- function(curl,cdest="none",type="none",c=0,r=0) {
+dload <- function(curl,type="none",cdest="none",reload=FALSE,c=0,r=0) {
         
-        x<-c("httr","httpuv","sqldf","dplyr","XML","xlsx","RMySQL","readr") #,"lubridate")
+        x<-c("jpeg","httr","httpuv","sqldf","dplyr","XML","xlsx","RMySQL","readr") #,"lubridate")
         lapply(x, require, character.only = TRUE)
         
         if(type=="xlsx") cdest <- paste(cdest,".xlsx",sep="")
         else if (type=="csv") cdest <- paste(cdest,".csv",sep="")
         else if(type=="xml") cdest <- paste(cdest,".xml",sep="")
         else if(type=="fwf") cdest <- paste(cdest,".fwf",sep="")
+        else if(type=="jpg") cdest <- paste(cdest,".jpg",sep="")
+        else if(type=="jpeg") cdest <- paste(cdest,".jpeg",sep="")
+        
         # print(cdest)
-        if(!file.exists(cdest)) {download.file(curl,cdest)}
+        if(cdest!="none" | type !="none") {
+                if(!file.exists(cdest) | reload) {download.file(curl,cdest)}
+        } else {stop("")}
 
         if(type=="xlsx") {
                 library(xlsx)
@@ -63,10 +68,10 @@ dload <- function(curl,cdest="none",type="none",c=0,r=0) {
                 readData
         } else if(type=="csv") {
                 library(data.table)
-                readData <- read.csv(cdest, stringsAsFactors=FALSE)
+                readData <- read.csv(cdest, stringsAsFactors=FALSE,header=FALSE,skip=5)
                 # readData <- fread(cdest)
-                readData<-data.frame(readData)
-                readData
+                readData<-tbl_df(readData)
+                readData <- select(readData)
         } else if(type=="xml"){
                 library(XML)
                 readData <- xmlTreeParse(cdest,useInternal=TRUE)
@@ -86,6 +91,15 @@ dload <- function(curl,cdest="none",type="none",c=0,r=0) {
                 readData<-data.table(readData)
                 readData<-select(readData,c(1,3,5,7,9,11,13,15,17))
                 readData
+        } else if(type=="jpg"){
+                
+                img <- readJPEG(cdest,native=TRUE)
+                img #<- tbl_df(img)
+                
+        }else if(type=="jpeg"){
+                
+                img <- readJPEG(cdest,native=TRUE)
+                img #<- tbl_df(img)
         }
 }
 
