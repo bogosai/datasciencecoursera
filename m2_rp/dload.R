@@ -1,7 +1,10 @@
 
 dload <- function(curl,type="none",cdest="none",reload=FALSE,c=0,r=0) {
         
-        x<-c("jpeg","httr","httpuv","sqldf","dplyr","XML","xlsx","RMySQL","readr") #,"lubridate")
+        x<-c("tibble","readr","tidyr","data.table","jpeg","httr","httpuv","sqldf","dplyr","XML","xlsx","RMySQL","readr","lubridate")
+        # for(i in 1:length(x)){
+        #         install.packages(x[i])
+        }
         lapply(x, require, character.only = TRUE)
         
         if(type=="xlsx") cdest <- paste(cdest,".xlsx",sep="")
